@@ -3,6 +3,25 @@ require 'heroku-api'
 require 'openssl'
 require 'rake'
 
+desc 'Ensure these configurations are set up for all apps'
+task :configurations do
+  Heroku::API.new(api_key: ENV['HEROKU_API_KEY']).tap do |heroku|
+    # List each app we are a collaborator on
+    heroku.get_apps.body.map do |response|
+      response['name']
+    end.each do |app|
+      ENV['TEMPLATE_CONFIG_KEYS'].to_s.split(',').reject do |key|
+	ENV[key].blank? || heroku.get_config_vars(app).body.keys.include?(key)
+      end.each do |key|
+        heroku.put_config_vars(
+          app, 
+	  key => ENV[key]
+        )
+      end
+    end
+  end
+end
+
 task :dependencies do
   # Fail fast, we don't have a DEPLOYHOOKS_HTTP_URL
   raise 'Please set $DEPLOYHOOKS_HTTP_URL with a %s at the end' unless
