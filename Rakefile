@@ -1,7 +1,26 @@
 require 'base64'
-require 'heroku-api'
+require 'bundler'
 require 'openssl'
-require 'rake'
+
+Bundler.require 
+
+desc 'Add all collaborators as collaborators on other apps' 
+task :collaborators do
+  Heroku::API.new(api_key: ENV['HEROKU_API_KEY']).tap do |heroku|
+    # List each app Haml is a collaborator on
+    collaborators = heroku.get_collaborators(ENV['HEROKU_APP_NAME']).body.map do |response|
+      response['email']
+    end
+
+    heroku.get_apps.body.map do |response|
+      response['name']
+    end.each do |app|
+      collaborators.each do |collaborator|
+        heroku.post_collaborator(app, collaborator)
+      end
+    end
+  end  
+end
 
 desc 'Ensure these configurations are set up for all apps'
 task :configurations do
@@ -18,6 +37,55 @@ task :configurations do
 	  key => ENV[key]
         )
       end
+    end
+  end
+end
+
+desc 'Ensure our demos builds are up to date. [Looks for collaborating apps starting with "demo-", e.g. "demo-third-prestige"]'
+task :rebuild_demos_from_backups do
+  require 'heroku/client/pgbackups' 
+
+  Heroku::API.new(api_key: ENV['HEROKU_API_KEY']).tap do |heroku|
+    heroku.get_apps.body.map do |response|
+      response['name']
+    end.select do |app|
+
+      # To add an app to this list, 
+      # we need to name the app starting with the prefix 'demo-'
+      # 
+      # For example:
+      # * demo-third-prestige
+      # * demo-blp
+      # * demo-simple-donation
+      #
+      app.start_with?('demo-') 
+    end.each do |app|
+
+      # Two-step process
+      # * Restore the latest non-automated backup (one that we captured manually)
+      # * Bust the cache by updating the RAILS_CACHE_ID
+
+      puts "Rebuilding demo for #{app}"
+      puts "=> Restoring database from latest non-automated build..."
+      configuration_variables = heroku.get_config_vars(app).body
+
+      Heroku::Client::Pgbackups.new(configuration_variables['PGBACKUPS_URL']).tap do |backups|
+          latest_non_automated_backup = backups.get_backups().find do |backup|
+            backup['to_url'] =~ /\/b[0-9]+.dump/
+          end
+
+          backups.create_transfer(
+            latest_non_automated_backup['to_url'], 
+            'BACKUP', 
+            configuration_variables['DATABASE_URL'], 
+            'RESTORE'
+          )
+      end
+
+      puts "=> Busting cache"
+      heroku.put_config_vars(app, 'RAILS_CACHE_ID' => Time.now.to_i)
+
+      puts "=> DONE", "\n" * 2
     end
   end
 end
