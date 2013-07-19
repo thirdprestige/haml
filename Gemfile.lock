@@ -11,10 +11,15 @@ GEM
       rubyzip
     heroku-api (0.3.7)
       excon (~> 0.16.10)
+    httparty (0.11.0)
+      multi_json (~> 1.0)
+      multi_xml (>= 0.5.2)
     kgio (2.7.4)
     launchy (2.1.2)
       addressable (~> 2.3)
     mime-types (1.21)
+    multi_json (1.7.7)
+    multi_xml (0.5.4)
     netrc (0.7.7)
     rack (1.4.3)
     raindrops (0.10.0)
@@ -33,6 +38,7 @@ PLATFORMS
 DEPENDENCIES
   heroku
   heroku-api
+  httparty
   rack
   rake
   unicorn

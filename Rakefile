@@ -1,10 +1,23 @@
 require 'base64'
 require 'bundler'
 require 'openssl'
+require './basecamp'
 
 Bundler.require 
 
-desc 'Add all collaborators as collaborators on other apps' 
+desc 'Test basecamp integration'
+task :basecamp do
+  Basecamp.client.assigned.each do |todo_list|
+    todo_list['assigned_todos'].each do |task|
+      # puts task.keys.inspect
+      # puts task.inspect
+    end
+  end
+
+  Basecamp.mark_as_completed(/test/i)
+end
+
+desc 'Add all collaborators on this app as collaborators on our  other apps' 
 task :collaborators do
   Heroku::API.new(api_key: ENV['HEROKU_API_KEY']).tap do |heroku|
     # List each app Haml is a collaborator on
@@ -15,11 +28,18 @@ task :collaborators do
     heroku.get_apps.body.map do |response|
       response['name']
     end.each do |app|
-      collaborators.each do |collaborator|
+      existing_collaborators = heroku.get_collaborators(app).body.map do |response|
+        response['email']
+      end
+
+      (collaborators - existing_collaborators).each do |collaborator|
+        puts "Adding #{collaborator} to #{app}"
         heroku.post_collaborator(app, collaborator)
       end
     end
-  end  
+
+    Basecamp.mark_as_completed(/heroku/i)
+  end
 end
 
 desc 'Ensure these configurations are set up for all apps'
