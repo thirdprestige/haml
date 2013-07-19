@@ -3,6 +3,12 @@ require 'json'
 
 class Basecamp
   class << self
+    def add_and_complete_todo(name)
+      client.mark_as_completed(
+        client.add_todo(name)
+      )
+    end
+
     def client
       @client ||= self.new
     end
@@ -65,6 +71,23 @@ class Basecamp
       puts response.inspect
       nil
     end
+  end
+
+  def add_todo name
+    response = HTTParty.post(
+      "#{@account_endpoint}/#{ENV['BASECAMP_TODO_LIST']}",
+      params.merge({
+        body: { 
+          assignee: { 
+            id: me['id'], 
+            type: 'Person'
+          },
+          content: name 
+        }.to_json
+      })
+    )
+
+    response.headers['location']
   end
 
   def assigned

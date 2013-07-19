@@ -14,7 +14,7 @@ task :basecamp do
     end
   end
 
-  Basecamp.mark_as_completed(/test/i)
+  Basecamp.add_and_complete_todo('Testing!')
 end
 
 desc 'Add all collaborators on this app as collaborators on our  other apps' 
@@ -108,6 +108,8 @@ task :rebuild_demos_from_backups do
       puts "=> DONE", "\n" * 2
     end
   end
+
+  Basecamp.add_and_complete_todo('Rebooted all the demos')
 end
 
 task :dependencies do
