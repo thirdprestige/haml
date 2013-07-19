@@ -3,12 +3,6 @@ require 'json'
 
 class Basecamp
   class << self
-    def add_and_complete_todo(name)
-      client.mark_as_completed(
-        client.add_todo(name)
-      )
-    end
-
     def client
       @client ||= self.new
     end

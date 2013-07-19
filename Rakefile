@@ -80,36 +80,37 @@ task :rebuild_demos_from_backups do
       #
       app.start_with?('demo-') 
     end.each do |app|
+      Basecamp.client.add_todo("Rebuild #{app} demo from scratch").tap do |task|
+        # Two-step process
+        # * Restore the latest non-automated backup (one that we captured manually)
+        # * Bust the cache by updating the RAILS_CACHE_ID
 
-      # Two-step process
-      # * Restore the latest non-automated backup (one that we captured manually)
-      # * Bust the cache by updating the RAILS_CACHE_ID
+        puts "Rebuilding demo for #{app}"
+        puts "=> Restoring database from latest non-automated build..."
+        configuration_variables = heroku.get_config_vars(app).body
 
-      puts "Rebuilding demo for #{app}"
-      puts "=> Restoring database from latest non-automated build..."
-      configuration_variables = heroku.get_config_vars(app).body
+        Heroku::Client::Pgbackups.new(configuration_variables['PGBACKUPS_URL']).tap do |backups|
+            latest_non_automated_backup = backups.get_backups().find do |backup|
+              backup['to_url'] =~ /\/b[0-9]+.dump/
+            end
 
-      Heroku::Client::Pgbackups.new(configuration_variables['PGBACKUPS_URL']).tap do |backups|
-          latest_non_automated_backup = backups.get_backups().find do |backup|
-            backup['to_url'] =~ /\/b[0-9]+.dump/
-          end
+            backups.create_transfer(
+              latest_non_automated_backup['to_url'], 
+              'BACKUP', 
+              configuration_variables['DATABASE_URL'], 
+              'RESTORE'
+            )
+        end
 
-          backups.create_transfer(
-            latest_non_automated_backup['to_url'], 
-            'BACKUP', 
-            configuration_variables['DATABASE_URL'], 
-            'RESTORE'
-          )
+        puts "=> Busting cache"
+        heroku.put_config_vars(app, 'RAILS_CACHE_ID' => Time.now.to_i)
+
+        puts "=> DONE", "\n" * 2
+
+        Basecamp.client.mark_as_completed(task)
       end
-
-      puts "=> Busting cache"
-      heroku.put_config_vars(app, 'RAILS_CACHE_ID' => Time.now.to_i)
-
-      puts "=> DONE", "\n" * 2
     end
   end
-
-  Basecamp.add_and_complete_todo('Rebooted all the demos')
 end
 
 task :dependencies do
