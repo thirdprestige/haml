@@ -36,6 +36,30 @@ end
 ##
 
 namespace :heroku do
+  desc 'Copy all production buckets to the development buckets each night'
+  task :copy_production_buckets_to_development do
+    Heroku::API.new(api_key: ENV['HEROKU_API_KEY']).tap do |heroku|
+      heroku.get_apps.body.map do |response|
+        response['name']
+      end.select do |app|
+        vars = heroku.get_config_vars(app).body
+
+        # Does a development bucket for this app's production bucket exist?
+        vars.keys.include?('AWS_S3_BUCKET') && AWS.s3.buckets[vars['AWS_S3_BUCKET'] + '-development'].exists?
+      end.each do |app|
+        Basecamp.client.add_todo("Copy #{app} bucket to development").tap do |task|
+          bucket = heroku.get_config_vars(app).body['AWS_S3_BUCKET']
+
+          AWS.s3.buckets[bucket].objects.each do |object|
+            object.copy_to(object.key, :bucket_name => bucket + '-development', :acl => :public_read)
+          end
+
+          Basecamp.client.mark_as_completed(task)
+        end
+      end
+    end
+  end
+
   desc 'Add all collaborators on this app as collaborators on our  other apps' 
   task :collaborators do
     Heroku::API.new(api_key: ENV['HEROKU_API_KEY']).tap do |heroku|
