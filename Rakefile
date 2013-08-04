@@ -94,7 +94,7 @@ namespace :heroku do
         response['name']
       end.each do |app|
         ENV['TEMPLATE_CONFIG_KEYS'].to_s.split(',').reject do |key|
-  	ENV[key].blank? || heroku.get_config_vars(app).body.keys.include?(key)
+  	ENV[key].empty? || heroku.get_config_vars(app).body.keys.include?(key)
         end.each do |key|
           heroku.put_config_vars(
             app, 
