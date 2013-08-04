@@ -51,6 +51,7 @@ namespace :heroku do
           bucket = heroku.get_config_vars(app).body['AWS_S3_BUCKET']
 
           AWS.s3.buckets[bucket].objects.each do |object|
+            puts "Copying #{object.key} from #{bucket} to #{bucket}-development"
             object.copy_to(object.key, :bucket_name => bucket + '-development', :acl => :public_read)
           end
 
