@@ -150,6 +150,7 @@ namespace :heroku do
           heroku.put_config_vars(app, 'RAILS_CACHE_ID' => Time.now.to_i)
 
           puts "=> DONE", "\n" * 2
+          puts task
 
           Basecamp.client.mark_as_completed(task)
         end
