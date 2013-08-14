@@ -81,6 +81,7 @@ class Basecamp
       })
     )
 
+    puts response.headers.inspect
     response.headers['location']
   end
 
