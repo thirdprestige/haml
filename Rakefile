@@ -16,6 +16,7 @@ require './commands/create_configurations'
 require './commands/dance'
 require './commands/github_authorizor'
 require './commands/stream'
+require './commands/welcome'
 
 desc 'Copy all production buckets to the development buckets each night'
 task :copy_production_buckets_to_development do

@@ -8,6 +8,7 @@ class Stream
       speak("~haml collaborate haml@thirdprestige.com :: Add 'haml@thirdprestige.com' to all of our Heroku Apps")
       speak("~haml dance")
       speak("~haml help :: Display this help message")
+      speak("~haml welcome :: Describe steps for welcoming a new team member")
     end
   end
 
@@ -37,6 +38,7 @@ class Stream
       when 'collaborate' then HerokuCollaborator.new(arguments)
       when 'dance'       then Dance.new
       when 'rebuild'     then DemoRebuilder.new
+      when 'welcome'     then Welcome.new
       else                    Help.new
       end.execute
 

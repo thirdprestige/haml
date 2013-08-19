@@ -23,8 +23,8 @@ module Speakable
     )
   end
 
-  def speak message
-    Array(message).each do |line|
+  def speak *messages
+    messages.flatten.each do |line|
       room.speak(line)
     end
   end
