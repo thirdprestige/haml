@@ -31,7 +31,7 @@ class Stream
         message = JSON.parse(json)
         
         if message['user_id'].nil?
-          Struct.new(:execute).new
+          Struct.new(:execute).new("")
         else          
           self.new(message['body'])
         end

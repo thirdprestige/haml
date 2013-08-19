@@ -1,3 +1,9 @@
+StreamBot
+---------
+
+Stream watches Campfire for certain commands and runs them.
+
+
 CacheBot
 --------
 
