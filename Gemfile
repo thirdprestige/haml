@@ -2,6 +2,7 @@ source 'https://rubygems.org'
 
 gem 'aws-sdk'
 gem 'eventmachine'
+gem 'ghee'
 gem 'heroku-api'
 gem 'heroku'
 gem 'rack'

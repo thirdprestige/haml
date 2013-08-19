@@ -1,19 +1,5 @@
 class Stream
-  class GitHubAuthorizor < Struct.new(:username)
-    include Speakable 
-
-    def execute
-      if username.empty?
-        speak("Please provide a GitHub username: `haml authorize @HamlTheHamster`")
-      else
-        speak("~haml authorize #{username}: n/a")
-      end
-    end
-  end
-
   class Help
-    include Speakable
-
     def execute
       speak("~haml apps :: List each app name Haml has access to")
       speak("~haml authorize @hamlthehamster :: Add GitHub user '@hamlthehamster' to our GitHub Team")
@@ -38,8 +24,6 @@ class Stream
       end
     end
 
-    include Speakable
-
     def execute
       to, command, arguments = body.split(' ').map(&:strip)
 
@@ -61,8 +45,6 @@ class Stream
       Help.new.execute
     end
   end
-
-  include Speakable
 
   def execute
     room.join

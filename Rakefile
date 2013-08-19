@@ -14,6 +14,7 @@ require './commands/copy_production_buckets_to_development'
 require './commands/create_collaborators'
 require './commands/create_configurations'
 require './commands/dance'
+require './commands/github_authorizor'
 require './commands/stream'
 
 desc 'Copy all production buckets to the development buckets each night'
