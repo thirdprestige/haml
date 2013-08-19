@@ -15,9 +15,10 @@ class Stream
   class Message < Struct.new(:body)
     class << self
       def from(json)
+        puts json.inspect
         message = JSON.parse(json)
         
-        if message['user_id'].nil?
+        if message['user_id'].nil? || message['body'].nil?
           Struct.new(:execute).new("")
         else          
           self.new(message['body'])
