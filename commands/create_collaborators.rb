@@ -6,7 +6,7 @@ class CreateCollaborators
 
     apps.each do |app|
       (collaborators - app.collaborators).each do |collaborator|
-        speak "Adding #{collaborator} to #{app}"
+        speak "Adding #{collaborator} to #{app.name}"
         app.collaborate(collaborator)
       end
     end

@@ -58,6 +58,10 @@ module Server
       #
       name.start_with?('demo-') 
     end
+
+    def to_s
+      name.to_s
+    end
   end
 
   class List
