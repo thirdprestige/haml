@@ -50,7 +50,12 @@ class Stream
   end
 
   def execute
-    room.join
+    Thread.new do
+      loop do
+        room.join
+        sleep 6000
+      end
+    end
 
     EventMachine::run do
       stream = Twitter::JSONStream.connect({
