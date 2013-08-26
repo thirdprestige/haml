@@ -29,6 +29,8 @@ class Stream
     def execute
       to, command, arguments = body.split(' ').map(&:strip)
 
+      speak("hi") if to == 'hi' && command == 'haml'
+
       return unless to == 'haml'
 
       case command
