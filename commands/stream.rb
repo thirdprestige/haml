@@ -32,6 +32,7 @@ class Stream
       if command =~ /haml/i
         speak("hi")                                     if to =~ /hi/i
         speak(%w[np yw anytime].sort_by { rand }.first) if to =~ /thanks|thx/i
+      end
 
       return unless to == 'haml'
 
