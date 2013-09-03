@@ -4,7 +4,7 @@ class Stream
       speak("~haml apps :: List each app name Haml has access to")
       speak("~haml authorize @hamlthehamster :: Add GitHub user '@hamlthehamster' to our GitHub Team")
       speak("~haml bucket :: Copy all our production S3 buckets to development")
-      speak("~haml bust third-prestige :: Bust the cache for the 'third-prestige' app") 
+      speak("~haml bust third-prestige :: Bust the cache for the 'third-prestige' app")
       speak("~haml collaborate haml@thirdprestige.com :: Add 'haml@thirdprestige.com' to all of our Heroku Apps")
       speak("~haml dance")
       speak("~haml help :: Display this help message")
@@ -17,10 +17,10 @@ class Stream
       def from(json)
         puts json.inspect
         message = JSON.parse(json)
-        
+
         if message['user_id'].nil? || message['body'].nil?
           Struct.new(:execute).new("")
-        else          
+        else
           self.new(message['body'])
         end
       end
@@ -29,7 +29,9 @@ class Stream
     def execute
       to, command, arguments = body.split(' ').map(&:strip)
 
-      speak("hi") if to == 'hi' && command == 'haml'
+      if command =~ /haml/i
+        speak("hi")                                     if to =~ /hi/i
+        speak(%w[np yw anytime].sort_by { rand }.first) if to =~ /thanks|thx/i
 
       return unless to == 'haml'
 
