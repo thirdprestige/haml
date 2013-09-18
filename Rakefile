@@ -2,7 +2,7 @@ require 'base64'
 require 'bundler'
 require 'openssl'
 
-Bundler.require 
+Bundler.require
 
 require './lib/speakable'
 require './lib/server'
@@ -13,6 +13,7 @@ require './commands/bust_cache'
 require './commands/copy_production_buckets_to_development'
 require './commands/create_collaborators'
 require './commands/create_configurations'
+require './commands/create_ping'
 require './commands/dance'
 require './commands/github_authorizor'
 require './commands/stream'
@@ -23,7 +24,7 @@ task :copy_production_buckets_to_development do
   CopyProductionBucketsToDevelopment.new.execute
 end
 
-desc 'Add all collaborators on this app as collaborators on our other apps' 
+desc 'Add all collaborators on this app as collaborators on our other apps'
 task :collaborators do
   CreateCollaborators.new.execute
 end
@@ -51,4 +52,8 @@ end
 desc 'Ensure a web hook is set up for all collaborators'
 task hooks: :dependencies do
   CreateHooks.new.execute
+end
+
+task :ping do
+  CreatePing.new.execute
 end
